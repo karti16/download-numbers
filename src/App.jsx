@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 
 function App() {
   const [maxLimit, setMaxLimit] = useState('');
+  const [isProcessRunning, setIsProcessRunning] = useState(false);
   const stop = useRef(false);
   const canvasRef = useRef(null);
 
@@ -31,11 +32,21 @@ function App() {
   };
 
   const handleDownload = async () => {
+    if (isProcessRunning) {
+      setIsProcessRunning(false);
+      stop.current = true;
+      return;
+    }
+
+    setIsProcessRunning(true);
+
     for (let i = 1; i <= maxLimit; i++) {
       await createCanvas(i, 500);
       downloadCanvas(i);
       if (stop.current) {
+        setIsProcessRunning(false);
         setCanvas(0);
+        setMaxLimit('');
         stop.current = false;
         break;
       }
@@ -43,12 +54,11 @@ function App() {
 
     stop.current = false;
     setMaxLimit('');
+    setIsProcessRunning(false);
   };
 
   const handleReset = () => {
-    setMaxLimit('');
     stop.current = true;
-    createCanvas(0)
   };
 
   function setCanvas(data) {
@@ -62,7 +72,7 @@ function App() {
     context.fillStyle = '#1248a1';
     context.fill();
     context.lineWidth = 2;
-    context.strokeStyle = 'black';
+    context.strokeStyle = 'white';
     context.stroke();
     context.font = '70px Arial';
     context.fillStyle = '#bbc1c9';
@@ -70,9 +80,13 @@ function App() {
     context.fontWeight = 'bold';
     context.fillText(data, centerX, centerY + 20);
   }
+
+  console.log({ isProcessRunning });
   return (
     <div className='flex gap-7 flex-col items-center'>
-      <h1 className='text-6xl font-bold pb-3 text-blue-500'>Download numbers 1 to {maxLimit === '' ? 'N' : maxLimit}</h1>
+      <h1 className='text-6xl font-bold pb-3 text-blue-500'>
+        Download numbers 1 to {maxLimit === '' ? 'N' : maxLimit}
+      </h1>
       <div className='flex gap-7 flex-col w-96'>
         <input
           pattern='[0-9]'
@@ -81,7 +95,7 @@ function App() {
           className='p-4 rounded-md focus:outline-none focus:ring focus:border-blue-500'
           value={maxLimit}
           onChange={(e) => {
-            const numericValue = e.target.value.replace(/[^0-9]/g, ""); 
+            const numericValue = e.target.value.replace(/[^0-9]/g, '');
             setMaxLimit(numericValue);
           }}
         />
@@ -91,8 +105,11 @@ function App() {
             Reset
           </button>
 
-          <button className='bg-blue-500 px-4 text-center text-slate-200 w-full h-10' onClick={handleDownload}>
-            Download
+          <button
+            className={`${isProcessRunning ? 'bg-red-500' : 'bg-blue-500'} px-4 text-center text-slate-200 w-full h-10`}
+            onClick={handleDownload}
+          >
+            {isProcessRunning ? 'Stop' : 'Download'}
           </button>
         </div>
       </div>
