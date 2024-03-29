@@ -59,6 +59,9 @@ function App() {
 
   const handleReset = () => {
     stop.current = true;
+    setMaxLimit('');
+    setCanvas(0);
+    setIsProcessRunning(false);
   };
 
   function setCanvas(data) {
