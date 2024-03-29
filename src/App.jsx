@@ -76,7 +76,7 @@ function App() {
       <div className='flex gap-7 flex-col w-96'>
         <input
           pattern='[0-9]'
-          placeholder='Numbers'
+          placeholder='Enter Numbers'
           type='text'
           className='p-4 rounded-md focus:outline-none focus:ring focus:border-blue-500'
           value={maxLimit}
